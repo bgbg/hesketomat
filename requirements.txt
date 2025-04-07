@@ -11,3 +11,4 @@ feedparser
 panel
 pandas
 fastapi-cors
+sqlite-vss
