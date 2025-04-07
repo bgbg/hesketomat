@@ -1,3 +1,4 @@
+import logging
 from fastapi import APIRouter, Depends, HTTPException, Query, Body
 from sqlalchemy.orm import Session
 from typing import List, Dict
@@ -6,6 +7,7 @@ from ..models.schemas import Podcast, PodcastCreate, Episode, SearchWeights
 from ..services import podcast_service
 from pydantic import BaseModel
 
+logger = logging.getLogger(__name__)
 router = APIRouter()
 
 
@@ -17,25 +19,36 @@ class RssUrlInput(BaseModel):
 def validate_rss_feed(
     input_data: RssUrlInput,
 ):
-    is_valid, message, homepage_url, image_url, description = (
-        podcast_service.validate_rss_feed(input_data.rss_url)
-    )
-    if not is_valid:
-        raise HTTPException(status_code=400, detail=message)
-    return {
-        "title": message,
-        "description": description,
-        "homepage_url": (
-            homepage_url
-            if homepage_url and homepage_url.startswith(("http://", "https://"))
-            else None
-        ),
-        "image_url": (
-            image_url
-            if image_url and image_url.startswith(("http://", "https://"))
-            else None
-        ),
-    }
+    logger.info(f"Validating RSS feed: {input_data.rss_url}")
+    try:
+        is_valid, message, homepage_url, image_url, description = (
+            podcast_service.validate_rss_feed(input_data.rss_url)
+        )
+        if not is_valid:
+            logger.warning(f"Invalid RSS feed: {input_data.rss_url} - {message}")
+            return {"valid": False, "error": message}
+        logger.info(f"Successfully validated RSS feed: {input_data.rss_url}")
+        return {
+            "valid": True,
+            "podcast": {
+                "title": message,
+                "description": description,
+                "rss_url": input_data.rss_url,
+                "homepage_url": (
+                    homepage_url
+                    if homepage_url and homepage_url.startswith(("http://", "https://"))
+                    else None
+                ),
+                "image_url": (
+                    image_url
+                    if image_url and image_url.startswith(("http://", "https://"))
+                    else None
+                ),
+            },
+        }
+    except Exception as e:
+        logger.error(f"Error validating RSS feed: {input_data.rss_url}", exc_info=True)
+        raise HTTPException(status_code=500, detail=str(e))
 
 
 @router.post("/podcasts/", response_model=Podcast)

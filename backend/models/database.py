@@ -2,8 +2,10 @@ from sqlalchemy import Column, Integer, String, DateTime, ForeignKey, create_eng
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship
 from datetime import datetime
+import os
 
 Base = declarative_base()
+
 
 class Podcast(Base):
     __tablename__ = "podcasts"
@@ -15,7 +17,10 @@ class Podcast(Base):
     image_url = Column(String)
     homepage_url = Column(String)
     last_updated = Column(DateTime, default=datetime.utcnow)
-    episodes = relationship("Episode", back_populates="podcast", cascade="all, delete-orphan")
+    episodes = relationship(
+        "Episode", back_populates="podcast", cascade="all, delete-orphan"
+    )
+
 
 class Episode(Base):
     __tablename__ = "episodes"
@@ -29,12 +34,17 @@ class Episode(Base):
     publish_date = Column(DateTime)
     podcast = relationship("Podcast", back_populates="episodes")
 
+
+# Create data directory if it doesn't exist
+os.makedirs("data", exist_ok=True)
+
 # Database URL will be loaded from environment variables
-SQLALCHEMY_DATABASE_URL = "sqlite:////Users/boris/devel/experimentations/hesketomat_m/hesketomat/data/podcasts.db"
+SQLALCHEMY_DATABASE_URL = "sqlite:///data/podcasts.db"
 
 engine = create_engine(
     SQLALCHEMY_DATABASE_URL, connect_args={"check_same_thread": False}
 )
 
+
 def create_tables():
-    Base.metadata.create_all(bind=engine) 
+    Base.metadata.create_all(bind=engine)
