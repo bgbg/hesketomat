@@ -1,0 +1,14 @@
+*.db
+**/.next
+.env
+frontend/.next/
+frontend/node_modules/
+.bin/
+*.tsx
+*.ts
+*.js
+*.jsx
+*.json
+*.css
+*.scss
+*.log

@@ -1,0 +1,13 @@
+fastapi
+uvicorn
+sqlalchemy
+pydantic
+pydantic-settings
+python-dotenv
+pytest
+pytest-asyncio
+httpx
+feedparser
+panel
+pandas
+fastapi-cors
