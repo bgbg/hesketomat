@@ -12,3 +12,8 @@ panel
 pandas
 fastapi-cors
 sqlite-vss
+faiss-cpu
+sentence-transformers
+torch
+python-bidi
+cachier
