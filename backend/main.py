@@ -2,6 +2,10 @@ import logging
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from backend.api.routes import router
+from backend.api.projects import router as projects_router
+from backend.api.interviews import router as interviews_router
+from backend.api.search import router as search_router
+from backend.api.text_refinement import router as text_refinement_router
 from backend.models.database import create_tables
 import time
 
@@ -43,6 +47,10 @@ async def log_requests(request: Request, call_next):
 
 # Include routers
 app.include_router(router, prefix="/api")
+app.include_router(projects_router, prefix="/api", tags=["Projects"])
+app.include_router(interviews_router, prefix="/api", tags=["Interviews"])
+app.include_router(search_router, prefix="/api", tags=["Search"])
+app.include_router(text_refinement_router, prefix="/api", tags=["Text Refinement"])
 
 
 # Create tables on startup
