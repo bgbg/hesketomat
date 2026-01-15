@@ -16,9 +16,7 @@ const InterviewPrepTab = dynamic(() => import('../components/InterviewPrepTab'),
   ssr: false,
 })
 
-const InterviewPrepTab = dynamic(() => import('../components/InterviewPrepTab'), {
-  ssr: false,
-})
+
 
 const ProjectsTab = dynamic(() => import('../components/ProjectsTab'), {
   ssr: false,
