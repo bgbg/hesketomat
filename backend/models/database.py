@@ -47,4 +47,6 @@ engine = create_engine(
 
 
 def create_tables():
+    # Import interview models to ensure they're registered with Base
+    from backend.models import interview_models  # noqa: F401
     Base.metadata.create_all(bind=engine)
