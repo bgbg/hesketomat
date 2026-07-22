@@ -332,15 +332,7 @@ export default function EpisodesTab() {
               <Spinner />
             </Center>
           ) : searchResults.length > 0 ? (
-            <Grid
-              templateColumns="repeat(3, 1fr)"
-              gap={4}
-              sx={{
-                '& > *:nth-of-type(3n+1)': { order: 3 },
-                '& > *:nth-of-type(3n+2)': { order: 2 },
-                '& > *:nth-of-type(3n+3)': { order: 1 },
-              }}
-            >
+            <Grid templateColumns="repeat(3, 1fr)" gap={4}>
               {searchResults.map(({ episode, matches }) => (
                 <Card key={episode.id}>
                   <CardBody>

@@ -159,16 +159,17 @@ def delete_all_episodes(db: Session, podcast_ids: List[int]) -> None:
 
 
 def get_episodes_for_podcasts(
-    db: Session, podcast_ids: List[int], skip: int = 0, limit: int = 100
+    db: Session, podcast_ids: List[int], skip: int = 0, limit: Optional[int] = None
 ) -> List[Episode]:
-    return (
+    query = (
         db.query(Episode)
         .filter(Episode.podcast_id.in_(podcast_ids))
         .order_by(Episode.publish_date.desc())
         .offset(skip)
-        .limit(limit)
-        .all()
     )
+    if limit is not None:
+        query = query.limit(limit)
+    return query.all()
 
 
 def search_episodes(
@@ -179,17 +180,10 @@ def search_episodes(
     description_weight: int = 50,
     cap_n_matches: int = 10,
     skip: int = 0,
-    limit: int = 100,
+    limit: Optional[int] = None,
 ) -> List[Dict]:
     if not query:
-        episodes = (
-            db.query(Episode)
-            .filter(Episode.podcast_id.in_(podcast_ids))
-            .order_by(Episode.publish_date.desc())
-            .offset(skip)
-            .limit(limit)
-            .all()
-        )
+        episodes = get_episodes_for_podcasts(db, podcast_ids, skip, limit)
         return [{"episode": episode, "matches": None} for episode in episodes]
 
     total = title_weight + description_weight
@@ -241,7 +235,11 @@ def search_episodes(
     )
 
     # Apply pagination
-    paginated_episodes = sorted_episodes[skip : skip + limit]
+    paginated_episodes = (
+        sorted_episodes[skip:]
+        if limit is None
+        else sorted_episodes[skip : skip + limit]
+    )
 
     # Return results in the expected format
     return [

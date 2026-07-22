@@ -1,7 +1,7 @@
 import logging
 from fastapi import APIRouter, Depends, HTTPException, Query, Body
 from sqlalchemy.orm import Session
-from typing import List, Dict
+from typing import List, Dict, Optional
 from ..models.database_session import get_db
 from ..models.schemas import Podcast, PodcastCreate, Episode, SearchWeights
 from ..services import podcast_service
@@ -91,7 +91,7 @@ def delete_episodes(podcast_ids: List[int] = Body(...), db: Session = Depends(ge
 def get_episodes(
     podcast_ids: List[int] = Query(...),
     skip: int = 0,
-    limit: int = 100,
+    limit: Optional[int] = None,
     db: Session = Depends(get_db),
 ):
     return podcast_service.get_episodes_for_podcasts(db, podcast_ids, skip, limit)
@@ -104,8 +104,8 @@ def search_episodes(
     title_weight: int = Body(50),
     description_weight: int = Body(50),
     cap_n_matches: int = Body(10),
-    skip: int = 0,
-    limit: int = 100,
+    skip: int = Body(0),
+    limit: Optional[int] = Body(None),
     db: Session = Depends(get_db),
 ):
     episodes = podcast_service.search_episodes(
